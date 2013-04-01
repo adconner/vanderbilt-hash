@@ -1,0 +1,7 @@
+#!/bin/bash
+
+cores=4
+
+for i in $(seq 1 $cores); do 
+  ./findhash &
+done
