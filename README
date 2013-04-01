@@ -1,0 +1,15 @@
+quick script to crunch hashes for xkcd 'Externalities' (http://xkcd.com/1193)
+
+check the standings at http://almamater.xkcd.com/best.csv
+
+This script is very rough currently; I invite improvements and pull requests. (A
+hash checker implemented on the GPU would be a dramatic improvement)
+
+dependencies:
+  python3
+    try changing the first line to #!/usr/bin/python3 if there are problems
+  pyskein (http://pythonhosted.org/pyskein/download.html)
+    to compute the skein hashes
+  requests (http://docs.python-requests.org/en/latest/)
+    currently used to screenscrape the target hash and to submit new bests
+  standard python libraries
