@@ -1,0 +1,70 @@
+#!/usr/bin/python
+
+#   skeinsum
+#   Copyright 2008, 2009 Hagen Fürstenau <hagen@zhuliguan.net>
+#
+#   Demonstrates Skein hashing with PySkein.
+#
+#   This program is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation, either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+import sys
+import os
+import skein
+import random
+from binascii import unhexlify
+
+HASH = skein.skein1024
+DIGEST_BITS = 1024
+DIGEST_BYTES = DIGEST_BITS // 8
+
+search = unhexlify(sys.stdin.buffer.read())
+# 
+# atomically modified (best so far, # bits off)
+best = (bytes([0 for i in range(DIGEST_BYTES)]), DIGEST_BITS)
+
+def countbits(byte):
+  sum = 0
+  while byte > 0:
+    sum += byte & 1
+    byte = byte >> 1
+  return sum
+
+def bitsoff(thehash):
+  return sum(bitsoff.tbl[thehash[i] ^ search[i]] for i in range(DIGEST_BYTES))
+bitsoff.tbl = [countbits(i) for i in range(256)]
+
+def atomicupdate(bstring, bitsoff):
+  global best
+  if bitsoff < best[1]:
+    best = (bytes(bstring), bitsoff)
+    print(bitsoff, bytes(bstring))
+
+def incstr(bytearr):
+  i = 0
+  while bytearr[i]==255:
+    bytearr[i] = 0
+    i += 1
+  if i < DIGEST_BYTES:
+    bytearr[i] += 1
+
+def findstart(start):
+  while True:
+    h = HASH(digest_bits=DIGEST_BITS)
+    bstring = bytes(start)
+    h.update(bstring)
+    bits = bitsoff(h.digest())
+    atomicupdate(bstring, bits)
+    incstr(start)
+
+findstart([random.randint(0,255) for i in range(DIGEST_BYTES)])
