@@ -69,8 +69,11 @@ def localsubmit(bstring):
   print(bitsoff(h.digest()))
 
 def submit(bstring):
-  r=requests.post("http://almamater.xkcd.com/?edu=vanderbilt.edu",data={'hashable':bstring})
-  print(r.status_code,r.reason,re.search("\d+ bits", r.text).group())
+  try:
+    r=requests.post("http://almamater.xkcd.com/?edu=vanderbilt.edu",data={'hashable':bstring})
+    print(r.status_code,r.reason,re.search("\d+ bits", r.text).group())
+  except:
+    print("POST ERROR: skipping", bstring)
 
 def main():
   global search
